@@ -1,3 +1,4 @@
+import { useState } from "react";
 const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
@@ -12,7 +13,21 @@ const getState = ({ getStore, getActions, setStore }) => {
 					background: "white",
 					initial: "white"
 				}
-			]
+			],
+			//cards
+			characters: [],
+			planets: [],
+			vehicles: [],
+			//fav
+			fav: [],
+			// details
+			person: [],
+			vehicle: [],
+			planet: [],
+			// detail properties
+			personDetail: [],
+			vehicleDetail: [],
+			planetDetail: []
 		},
 		actions: {
 			// Use getActions to call a function within a fuction
@@ -21,8 +36,26 @@ const getState = ({ getStore, getActions, setStore }) => {
 			},
 			loadSomeData: () => {
 				/**
-					fetch().then().then(data => setStore({ "foo": data.bar }))
-				*/
+                    fetch().then().then(data => setStore({ "foo": data.bar }))    
+                */
+
+				//vehicles
+				fetch("https://www.swapi.tech/api/vehicles/")
+					.then(res => res.json())
+					.then(data => setStore({ vehicles: data.results }))
+					.catch(err => console.error(err));
+
+				//characters
+				fetch("https://www.swapi.tech/api/people/")
+					.then(res => res.json())
+					.then(data => setStore({ characters: data.results }))
+					.catch(err => console.error(err));
+
+				//planets
+				fetch("https://www.swapi.tech/api/planets/")
+					.then(res => res.json())
+					.then(data => setStore({ planets: data.results }))
+					.catch(err => console.error(err));
 			},
 			changeColor: (index, color) => {
 				//get the store
@@ -37,6 +70,37 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 				//reset the global store
 				setStore({ demo: demo });
+			},
+			getCharacter: id => {
+				fetch("https://www.swapi.tech/api/people/" + id)
+					.then(res => res.json())
+					.then(data => setStore({ person: data.result, personDetail: data.result.properties }))
+					.catch(err => console.error(err));
+			},
+			getPlanet: id => {
+				fetch("https://www.swapi.tech/api/planets/" + id)
+					.then(res => res.json())
+					.then(data => setStore({ planet: data.result, planetDetail: data.result.properties }))
+					.catch(err => console.error(err));
+			},
+
+			getVehicle: id => {
+				fetch("https://www.swapi.tech/api/vehicles/" + id)
+					.then(res => res.json())
+					.then(data => setStore({ vehicle: data.result, vehicleDetail: data.result.properties }))
+					.catch(err => console.error(err));
+			},
+			//Agregar y quitar favs
+			addFav: item => {
+				const store = getStore();
+				let favCopy = [...store.fav];
+				favCopy.push(item);
+				setStore({ fav: favCopy });
+			},
+			removeFav: elem => {
+				const store = getStore();
+				let favCopy = [...store.fav];
+				setStore({ fav: favCopy.filter(item => item !== elem) });
 			}
 		}
 	};
